@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>加古川市の文化遺産・動画ギャラリー</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0e0e0e;
+      color: #f0f0f0;
+      font-family: 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 24px 32px 16px;
+      border-bottom: 1px solid #222;
+      background: #111;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #fff;
+    }
+
+    header .credit {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      color: #888;
+      letter-spacing: 0.03em;
+    }
+
+    /* ======= Player Area ======= */
+    #player-section {
+      display: none;
+      background: #000;
+      position: relative;
+    }
+
+    #player-section.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #main-video {
+      width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      background: #000;
+    }
+
+    #now-playing-label {
+      width: 100%;
+      padding: 10px 20px;
+      background: rgba(0,0,0,0.85);
+      font-size: 0.85rem;
+      color: #aaa;
+      letter-spacing: 0.05em;
+    }
+
+    #now-playing-label span {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* ======= Thumbnail Grid ======= */
+    #gallery {
+      padding: 28px 28px 40px;
+    }
+
+    #gallery h2 {
+      font-size: 0.85rem;
+      color: #666;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .thumb-card {
+      background: #1a1a1a;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      position: relative;
+    }
+
+    .thumb-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+      border-color: #444;
+    }
+
+    .thumb-card.playing {
+      border-color: #e53935;
+      box-shadow: 0 0 0 2px #e53935aa;
+    }
+
+    .thumb-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #111;
+      overflow: hidden;
+    }
+
+    .thumb-canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Play overlay icon */
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.35);
+      transition: background 0.2s;
+    }
+
+    .thumb-card:hover .play-overlay {
+      background: rgba(0,0,0,0.15);
+    }
+
+    .thumb-card.playing .play-overlay {
+      background: rgba(229,57,53,0.18);
+    }
+
+    .play-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .thumb-card:hover .play-icon {
+      background: rgba(229,57,53,0.85);
+      transform: scale(1.08);
+    }
+
+    .thumb-card.playing .play-icon {
+      background: rgba(229,57,53,0.9);
+    }
+
+    .play-icon svg {
+      margin-left: 4px;
+    }
+
+    /* LIVE badge for currently playing */
+    .live-badge {
+      display: none;
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: #e53935;
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+
+    .thumb-card.playing .live-badge {
+      display: block;
+    }
+
+    .thumb-info {
+      padding: 12px 14px;
+    }
+
+    .thumb-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #f0f0f0;
+      line-height: 1.4;
+      word-break: break-all;
+    }
+
+    .thumb-sub {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .thumb-desc {
+      font-size: 0.8rem;
+      color: #aaa;
+      margin-top: 8px;
+      line-height: 1.6;
+      border-top: 1px solid #2a2a2a;
+      padding-top: 8px;
+    }
+
+    .thumb-ref {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.72rem;
+      color: #555;
+    }
+
+    .thumb-ref a {
+      color: #6a9fd8;
+      text-decoration: none;
+    }
+
+    .thumb-ref a:hover {
+      text-decoration: underline;
+    }
+
+    /* Info-only card (no video) */
+    .thumb-card.info-only {
+      cursor: default;
+    }
+
+    .thumb-card.info-only:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: #333;
+    }
+
+    .info-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #161616;
+      gap: 8px;
+    }
+
+    .info-placeholder span {
+      font-size: 2.4rem;
+    }
+
+    .info-placeholder p {
+      font-size: 0.72rem;
+      color: #555;
+      letter-spacing: 0.06em;
+    }
+
+    .info-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: #3a3a3a;
+      color: #aaa;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+
+    /* Loading spinner on canvas while seeking */
+    .thumb-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #111;
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid #333;
+      border-top-color: #888;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ======= Responsive ======= */
+    @media (max-width: 600px) {
+      header {
+        padding: 16px 16px 12px;
+      }
+      header h1 {
+        font-size: 1.05rem;
+      }
+      header .credit {
+        font-size: 0.7rem;
+      }
+      #gallery {
+        padding: 16px 12px 28px;
+      }
+      #map-section {
+        padding: 16px 12px 28px;
+      }
+      .thumb-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .thumb-desc {
+        font-size: 0.78rem;
+      }
+      #map {
+        height: 300px;
+      }
+      #now-playing-label {
+        font-size: 0.78rem;
+        padding: 8px 12px;
+      }
+    }
+
+    @media (min-width: 601px) and (max-width: 900px) {
+      header {
+        padding: 18px 20px 14px;
+      }
+      #gallery {
+        padding: 20px 16px 32px;
+      }
+      #map-section {
+        padding: 20px 16px 32px;
+      }
+      .thumb-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+      }
+      #map {
+        height: 360px;
+      }
+    }
+
+    /* ======= Map Section ======= */
+    #map-section {
+      padding: 28px 28px 40px;
+      border-top: 1px solid #1e1e1e;
+    }
+
+    #map-section h2 {
+      font-size: 0.85rem;
+      color: #666;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    #map {
+      width: 100%;
+      height: 420px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #2a2a2a;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🎬 加古川市の文化遺産・動画ギャラリー</h1>
+  <p class="credit">制作：兵庫県立東播工業高等学校 建築科 ファブラボスタジオ（FabLab Studio）</p>
+</header>
+
+<!-- メインプレイヤー -->
+<section id="player-section">
+  <video id="main-video" autoplay loop playsinline></video>
+  <div id="now-playing-label">再生中：<span id="now-playing-title">—</span></div>
+</section>
+
+<!-- サムネイルギャラリー -->
+<div id="gallery">
+  <h2>動画一覧</h2>
+  <div class="thumb-grid" id="thumb-grid"></div>
+</div>
+
+<!-- 地図 -->
+<div id="map-section">
+  <h2>📍 所在地マップ（加古川市）</h2>
+  <div id="map"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+  // ===== 地図の初期化 =====
+  const map = L.map('map').setView([34.775, 134.860], 12);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+    maxZoom: 18
+  }).addTo(map);
+
+  // マーカー情報（住所から確認した座標をハードコード）
+  const spots = [
+    {
+      lat: 34.76477, lon: 134.86173,
+      label: '🌉 平木橋／市指定文化財',
+      sub: '加古川市野口町水足247',
+      note: '大正4年（1915）建造の水路橋。市指定文化財。'
+    },
+    {
+      lat: 34.79148, lon: 134.85160,
+      label: '🪨 稚児窟石棺蓋／市指定文化財',
+      sub: '加古川市平荘町69',
+      note: '6世紀末〜7世紀初頭の家形石棺蓋。市指定文化財。'
+    },
+    {
+      lat: 34.78159, lon: 134.88669,
+      label: '🏛 尼塚古墳／国指定史跡',
+      sub: '加古川市西条古墳群',
+      note: '5世紀中葉頃築造の帆立貝式古墳。国指定史跡・西条古墳群のひとつ。'
+    },
+    {
+      lat: 34.75228, lon: 134.83261,
+      label: '⛩ 鶴林寺本堂／国宝',
+      sub: '加古川市加古川町北在家424',
+      note: '14世紀建立の折衷様式建築。国宝。'
+    },
+    {
+      lat: 34.75213, lon: 134.83283,
+      label: '⛩ 鶴林寺太子堂／国宝',
+      sub: '加古川市加古川町北在家424',
+      note: '兵庫県最古の建築。天台宗の法華堂。国宝。'
+    },
+    {
+      lat: 34.75231, lon: 134.83292,
+      label: '🔔 鶴林寺鐘楼／国指定重要文化財',
+      sub: '加古川市加古川町北在家424',
+      note: '袴腰造りの大型鐘楼。高麗時代の朝鮮鐘を所蔵。重要文化財。'
+    }
+  ];
+
+  const bounds = spots.map(s => [s.lat, s.lon]);
+
+  spots.forEach((spot, i) => {
+    const marker = L.marker([spot.lat, spot.lon]).addTo(map);
+    marker.bindPopup(`
+      <div style="font-family:'Hiragino Kaku Gothic Pro','Meiryo',sans-serif;min-width:190px;">
+        <strong style="font-size:1rem;">${spot.label}</strong><br>
+        <span style="font-size:0.8rem;color:#666;">${spot.sub}</span><br>
+        <span style="font-size:0.78rem;margin-top:4px;display:block;">${spot.note}</span>
+      </div>
+    `);
+    if (i === 0) marker.openPopup();
+  });
+
+  map.fitBounds(bounds, { padding: [60, 60] });
+
+  // ===== 動画ファイルリスト（同じフォルダ内）=====
+  const videos = [
+    {
+      file: '平木橋.mp4',
+      label: '平木橋／市指定文化財',
+      desc: '野口町水足の前ノ池に移築保存されている水路橋。花崗岩のアーチと煉瓦の橋壁を組み合わせた構造が特徴で、大正4年（1915）に山田川疏水事業の一環として建造されました。いなみ野台地の農業用水を支えた近代土木遺産として高く評価され、道路建設に伴い平成21年（2009）に現在地へ移築後、市指定文化財に指定されています。',
+      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/sisiteikaisetu/sisiteihirakibasi.html'
+    },
+    {
+      file: '稚児窟石棺蓋.mp4',
+      label: '稚児窟石棺蓋／市指定文化財',
+      desc: '池尻16号墳（稚児窟）に納められていた家形石棺の蓋。地元産の竜山石（流紋岩質溶結凝灰岩）製で、最大長242cmは市内最大級。縄掛突起を6個もち、表面は高度な技術で丁寧に仕上げられています。6世紀末〜7世紀初頭（古墳時代後期〜飛鳥時代初め）の製作とみられ、播磨の古代史とヤマト政権との関係を考えるうえで学術的価値の高い市指定文化財です。',
+      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/sisiteikaisetu/38602.html'
+    },
+    {
+      file: '尼塚古墳.mp4',
+      label: '尼塚古墳／国指定史跡',
+      desc: '5世紀中葉頃に築造された墳長51mの造り出し付き円墳（帆立貝式古墳）で、国史跡「西条古墳群」を構成する3基のひとつ。平成18年（2006）の発掘調査で人塚古墳と類似した構造をもつことが判明し、墳丘からは円筒埴輪列が出土しています。行者塚・人塚・尼塚と続く古墳群全体に共通するのは規模と構造が段階的に縮小していく変遷で、5世紀の東播磨における首長権の移り変わりを読み解く重要な手がかりとなっています。西条廃寺跡と隣接し、現在は史跡公園として整備・公開されています。',
+      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
+    },
+    {
+      file: '鶴林寺本堂.mp4',
+      label: '鶴林寺本堂／国宝',
+      desc: '薬師如来・日光菩薩・月光菩薩を本尊とし、説法や儀式の場として「大講堂」とも称される。和様に唐様・天竺様を融合した折衷様式（14世紀）の最高峰とされる建築で、内部は内陣と外陣に分かれる。内陣の宮殿には60年に一度のみ開帳される10世紀頃の秘仏5体が安置されており、板戸に描かれた鶴の絵は日本最古とされる。',
+      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
+    },
+    {
+      file: '鶴林寺太子堂.mp4',
+      label: '鶴林寺太子堂／国宝',
+      desc: '釈迦如来・文殊菩薩・普賢菩薩・四天王を本尊とする兵庫県最古の建築。聖徳太子ゆかりの聖霊院を前身とする天台宗の法華堂で、桧皮葺きの屋根と小組格天井が特徴。昭和51年（1976）の赤外線調査により、九品来迎図・涅槃図・飛天図など創建当時の壁画が発見されたが、今もすすに覆われ肉眼では確認できない。',
+      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
+    },
+    {
+      file: '鶴林寺鐘楼.mp4',
+      label: '鶴林寺鐘楼／国指定重要文化財',
+      desc: '2階に上って鐘をつく「袴腰造り」と呼ばれる珍しい構造をもつ大型鐘楼。国宝本堂と一連に建立され、均整のとれた美しさで知られる。重要文化財の梵鐘は約1000年前の高麗時代に造られた朝鮮鐘で、「黄鐘調」の澄んだ音色をもつ名鐘として伝わる。',
+      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
+    },
+  ];
+
+  const grid           = document.getElementById('thumb-grid');
+  const playerSection  = document.getElementById('player-section');
+  const mainVideo      = document.getElementById('main-video');
+  const nowPlayingTitle = document.getElementById('now-playing-title');
+
+  let currentIndex = -1;
+
+  // ===== サムネイルカードを生成 =====
+  // 動画インデックス（infoOnlyを除く）
+  let videoIndex = 0;
+  videos.forEach((v, i) => {
+    const card = document.createElement('div');
+    card.dataset.index = i;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'thumb-wrapper';
+
+    if (v.infoOnly) {
+      // ===== 情報のみカード =====
+      card.className = 'thumb-card info-only';
+
+      wrapper.innerHTML = `
+        <div class="info-placeholder">
+          <span>${v.icon || '🏛'}</span>
+          <p>動画なし</p>
+        </div>
+        <span class="info-badge">INFO</span>`;
+    } else {
+      // ===== 動画カード =====
+      card.className = 'thumb-card';
+
+      const loadDiv = document.createElement('div');
+      loadDiv.className = 'thumb-loading';
+      loadDiv.innerHTML = '<div class="spinner"></div>';
+
+      const canvas = document.createElement('canvas');
+      canvas.className = 'thumb-canvas';
+      canvas.style.display = 'none';
+
+      const overlay = document.createElement('div');
+      overlay.className = 'play-overlay';
+      overlay.innerHTML = `
+        <div class="play-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </div>`;
+
+      const badge = document.createElement('span');
+      badge.className = 'live-badge';
+      badge.textContent = 'PLAYING';
+
+      wrapper.appendChild(loadDiv);
+      wrapper.appendChild(canvas);
+      wrapper.appendChild(overlay);
+      wrapper.appendChild(badge);
+
+      captureThumb(v.file, canvas, loadDiv);
+
+      const vi = videoIndex++;
+      card.addEventListener('click', () => playVideo(i, vi));
+    }
+
+    const info = document.createElement('div');
+    info.className = 'thumb-info';
+    info.innerHTML = `
+      <div class="thumb-title">${v.label}</div>
+      ${v.file ? `<div class="thumb-sub">${v.file}</div>` : ''}
+      <div class="thumb-desc">${v.desc}</div>
+      <span class="thumb-ref">出典：<a href="${v.ref}" target="_blank" rel="noopener">加古川市文化財調査研究センター</a></span>`;
+
+    card.appendChild(wrapper);
+    card.appendChild(info);
+    grid.appendChild(card);
+  });
+
+  // ===== 動画からフレームをキャプチャしてcanvasに描画 =====
+  function captureThumb(file, canvas, loadDiv) {
+    const tmpVideo = document.createElement('video');
+    tmpVideo.src = file;
+    tmpVideo.muted = true;
+    tmpVideo.playsInline = true;
+    tmpVideo.preload = 'metadata';
+
+    tmpVideo.addEventListener('loadedmetadata', () => {
+      // 動画の10%付近のフレームをキャプチャ
+      tmpVideo.currentTime = Math.min(tmpVideo.duration * 0.1, 3);
+    });
+
+    tmpVideo.addEventListener('seeked', () => {
+      const w = 480, h = 270;
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(tmpVideo, 0, 0, w, h);
+      loadDiv.style.display = 'none';
+      canvas.style.display = 'block';
+      tmpVideo.src = ''; // 解放
+    });
+
+    tmpVideo.addEventListener('error', () => {
+      // エラー時は代替表示
+      loadDiv.innerHTML = '<span style="color:#555;font-size:0.75rem;">preview<br>unavailable</span>';
+    });
+  }
+
+  // ===== 動画を再生 =====
+  function playVideo(index) {
+    if (index === currentIndex) return;
+
+    // 以前のカードのハイライトを解除
+    if (currentIndex !== -1) {
+      const prev = grid.querySelector(`.thumb-card[data-index="${currentIndex}"]`);
+      if (prev) prev.classList.remove('playing');
+    }
+
+    currentIndex = index;
+    const v = videos[index];
+    if (v.infoOnly) return;
+
+    // プレイヤーを表示
+    playerSection.classList.add('active');
+    mainVideo.src = v.file;
+    mainVideo.loop = true;
+    mainVideo.play();
+    nowPlayingTitle.textContent = v.label;
+
+    // 再生中カードをハイライト
+    const card = grid.querySelector(`.thumb-card[data-index="${index}"]`);
+    if (card) {
+      card.classList.add('playing');
+      // スムーズにプレイヤーへスクロール
+      playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+</script>
+
+</body>
+</html>
