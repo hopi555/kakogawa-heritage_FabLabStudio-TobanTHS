@@ -544,18 +544,21 @@
   const videos = [
     {
       file: '平木橋.mp4',
+      thumb: 'thumb_平木橋.jpg',
       label: '平木橋／市指定文化財',
       desc: '野口町水足の前ノ池に移築保存されている水路橋。花崗岩のアーチと煉瓦の橋壁を組み合わせた構造が特徴で、大正4年（1915）に山田川疏水事業の一環として建造されました。いなみ野台地の農業用水を支えた近代土木遺産として高く評価され、道路建設に伴い平成21年（2009）に現在地へ移築後、市指定文化財に指定されています。',
       ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/sisiteikaisetu/sisiteihirakibasi.html'
     },
     {
       file: '稚児窟石棺蓋.mp4',
+      thumb: 'thumb_稚児窟石棺蓋.jpg',
       label: '稚児窟石棺蓋／市指定文化財',
       desc: '池尻16号墳（稚児窟）に納められていた家形石棺の蓋。地元産の竜山石（流紋岩質溶結凝灰岩）製で、最大長242cmは市内最大級。縄掛突起を6個もち、表面は高度な技術で丁寧に仕上げられています。6世紀末〜7世紀初頭（古墳時代後期〜飛鳥時代初め）の製作とみられ、播磨の古代史とヤマト政権との関係を考えるうえで学術的価値の高い市指定文化財です。',
       ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/sisiteikaisetu/38602.html'
     },
     {
       file: '尼塚古墳.mp4',
+      thumb: 'thumb_尼塚古墳.jpg',
       label: '尼塚古墳／国指定史跡',
       desc: '5世紀中葉頃に築造された墳長51mの造り出し付き円墳（帆立貝式古墳）で、国史跡「西条古墳群」を構成する3基のひとつ。平成18年（2006）の発掘調査で人塚古墳と類似した構造をもつことが判明し、墳丘からは円筒埴輪列が出土しています。行者塚・人塚・尼塚と続く古墳群全体に共通するのは規模と構造が段階的に縮小していく変遷で、5世紀の東播磨における首長権の移り変わりを読み解く重要な手がかりとなっています。西条廃寺跡と隣接し、現在は史跡公園として整備・公開されています。',
       ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
@@ -569,6 +572,7 @@
     },
     {
       file: '鶴林寺太子堂.mp4',
+      thumb: 'thumb_鶴林寺太子堂.jpg',
       label: '鶴林寺太子堂／国宝',
       desc: '釈迦如来・文殊菩薩・普賢菩薩・四天王を本尊とする兵庫県最古の建築。聖徳太子ゆかりの聖霊院を前身とする天台宗の法華堂で、桧皮葺きの屋根と小組格天井が特徴。昭和51年（1976）の赤外線調査により、九品来迎図・涅槃図・飛天図など創建当時の壁画が発見されたが、今もすすに覆われ肉眼では確認できない。',
       ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
@@ -651,30 +655,12 @@
       badge.className = 'live-badge';
       badge.textContent = 'PLAYING';
 
-      if (v.thumb) {
-        // 静止画サムネイルを使用
-        const img = document.createElement('img');
-        img.className = 'thumb-canvas';
-        img.src = v.thumb;
-        img.alt = v.label;
-        img.style.objectFit = 'cover';
-        img.style.width = '100%';
-        img.style.height = '100%';
-        wrapper.appendChild(img);
-      } else {
-        // Canvasでキャプチャ
-        const loadDiv = document.createElement('div');
-        loadDiv.className = 'thumb-loading';
-        loadDiv.innerHTML = '<div class="spinner"></div>';
-
-        const canvas = document.createElement('canvas');
-        canvas.className = 'thumb-canvas';
-        canvas.style.display = 'none';
-
-        wrapper.appendChild(loadDiv);
-        wrapper.appendChild(canvas);
-        captureThumb(v.file, canvas, loadDiv);
-      }
+      // 静止画サムネイルを使用（全動画共通）
+      const img = document.createElement('img');
+      img.className = 'thumb-canvas';
+      img.src = v.thumb || '';
+      img.alt = v.label;
+      wrapper.appendChild(img);
 
       wrapper.appendChild(overlay);
       wrapper.appendChild(badge);
