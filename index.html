@@ -490,6 +490,7 @@
     },
     {
       file: '鶴林寺本堂.mp4',
+      thumb: 'thumb_鶴林寺本堂.jpg',
       label: '鶴林寺本堂／国宝',
       desc: '薬師如来・日光菩薩・月光菩薩を本尊とし、説法や儀式の場として「大講堂」とも称される。和様に唐様・天竺様を融合した折衷様式（14世紀）の最高峰とされる建築で、内部は内陣と外陣に分かれる。内陣の宮殿には60年に一度のみ開帳される10世紀頃の秘仏5体が安置されており、板戸に描かれた鶴の絵は日本最古とされる。',
       ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
@@ -502,6 +503,7 @@
     },
     {
       file: '鶴林寺鐘楼.mp4',
+      thumb: 'thumb_鶴林寺鐘楼.jpg',
       label: '鶴林寺鐘楼／国指定重要文化財',
       desc: '2階に上って鐘をつく「袴腰造り」と呼ばれる珍しい構造をもつ大型鐘楼。国宝本堂と一連に建立され、均整のとれた美しさで知られる。重要文化財の梵鐘は約1000年前の高麗時代に造られた朝鮮鐘で、「黄鐘調」の澄んだ音色をもつ名鐘として伝わる。',
       ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
@@ -539,14 +541,6 @@
       // ===== 動画カード =====
       card.className = 'thumb-card';
 
-      const loadDiv = document.createElement('div');
-      loadDiv.className = 'thumb-loading';
-      loadDiv.innerHTML = '<div class="spinner"></div>';
-
-      const canvas = document.createElement('canvas');
-      canvas.className = 'thumb-canvas';
-      canvas.style.display = 'none';
-
       const overlay = document.createElement('div');
       overlay.className = 'play-overlay';
       overlay.innerHTML = `
@@ -560,12 +554,33 @@
       badge.className = 'live-badge';
       badge.textContent = 'PLAYING';
 
-      wrapper.appendChild(loadDiv);
-      wrapper.appendChild(canvas);
+      if (v.thumb) {
+        // 静止画サムネイルを使用
+        const img = document.createElement('img');
+        img.className = 'thumb-canvas';
+        img.src = v.thumb;
+        img.alt = v.label;
+        img.style.objectFit = 'cover';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        wrapper.appendChild(img);
+      } else {
+        // Canvasでキャプチャ
+        const loadDiv = document.createElement('div');
+        loadDiv.className = 'thumb-loading';
+        loadDiv.innerHTML = '<div class="spinner"></div>';
+
+        const canvas = document.createElement('canvas');
+        canvas.className = 'thumb-canvas';
+        canvas.style.display = 'none';
+
+        wrapper.appendChild(loadDiv);
+        wrapper.appendChild(canvas);
+        captureThumb(v.file, canvas, loadDiv);
+      }
+
       wrapper.appendChild(overlay);
       wrapper.appendChild(badge);
-
-      captureThumb(v.file, canvas, loadDiv);
 
       const vi = videoIndex++;
       card.addEventListener('click', () => playVideo(i, vi));
