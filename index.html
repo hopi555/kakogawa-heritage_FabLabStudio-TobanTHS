@@ -243,7 +243,7 @@
       display: none;
       position: absolute;
       top: 8px;
-      left: 8px;
+      right: 8px;
       background: #e53935;
       color: #fff;
       font-size: 0.65rem;
@@ -255,6 +255,63 @@
 
     .thumb-card.playing .live-badge {
       display: block;
+    }
+
+    /* ===== 文化財指定バッジ ===== */
+    .desig-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 3px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .badge-kokuhо   { background: #c8a429; color: #1a1a1a; } /* 国宝：金 */
+    .badge-jubun    { background: #c0390b; color: #fff;    } /* 重要文化財：赤橙 */
+    .badge-shiseki  { background: #2d7a4f; color: #fff;    } /* 史跡：緑 */
+    .badge-shitei   { background: #1a5a9a; color: #fff;    } /* 市指定：青 */
+
+    /* ===== グループヘッダー ===== */
+    .group-header {
+      grid-column: 1 / -1;
+      margin: 28px 0 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #2e2e2e;
+    }
+
+    .group-header:first-child {
+      margin-top: 0;
+    }
+
+    .group-header .group-level {
+      font-size: 0.68rem;
+      color: #666;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .group-header .group-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #ddd;
+      letter-spacing: 0.04em;
+    }
+
+    .group-header .group-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 7px;
+      vertical-align: middle;
+      position: relative;
+      top: -1px;
     }
 
     .thumb-info {
@@ -540,145 +597,177 @@
 
   map.fitBounds(bounds, { padding: [60, 60] });
 
-  // ===== 動画ファイルリスト（同じフォルダ内）=====
+  // ===== 動画ファイルリスト（文化財区分順）=====
   const videos = [
+    // ── 国宝　建造物 ──────────────────────────
     {
-      file: '平木橋.mp4',
-      thumb: 'thumb_平木橋.jpg',
-      label: '平木橋／市指定文化財',
-      desc: '野口町水足の前ノ池に移築保存されている水路橋。花崗岩のアーチと煉瓦の橋壁を組み合わせた構造が特徴で、大正4年（1915）に山田川疏水事業の一環として建造されました。いなみ野台地の農業用水を支えた近代土木遺産として高く評価され、道路建設に伴い平成21年（2009）に現在地へ移築後、市指定文化財に指定されています。',
-      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/sisiteikaisetu/sisiteihirakibasi.html'
-    },
-    {
-      file: '稚児窟石棺蓋.mp4',
-      thumb: 'thumb_稚児窟石棺蓋.jpg',
-      label: '稚児窟石棺蓋／市指定文化財',
-      desc: '池尻16号墳（稚児窟）に納められていた家形石棺の蓋。地元産の竜山石（流紋岩質溶結凝灰岩）製で、最大長242cmは市内最大級。縄掛突起を6個もち、表面は高度な技術で丁寧に仕上げられています。6世紀末〜7世紀初頭（古墳時代後期〜飛鳥時代初め）の製作とみられ、播磨の古代史とヤマト政権との関係を考えるうえで学術的価値の高い市指定文化財です。',
-      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/sisiteikaisetu/38602.html'
-    },
-    {
-      file: '尼塚古墳.mp4',
-      thumb: 'thumb_尼塚古墳.jpg',
-      label: '尼塚古墳／国指定史跡',
-      desc: '5世紀中葉頃に築造された墳長51mの造り出し付き円墳（帆立貝式古墳）で、国史跡「西条古墳群」を構成する3基のひとつ。平成18年（2006）の発掘調査で人塚古墳と類似した構造をもつことが判明し、墳丘からは円筒埴輪列が出土しています。行者塚・人塚・尼塚と続く古墳群全体に共通するのは規模と構造が段階的に縮小していく変遷で、5世紀の東播磨における首長権の移り変わりを読み解く重要な手がかりとなっています。西条廃寺跡と隣接し、現在は史跡公園として整備・公開されています。',
-      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
-    },
-    {
-      file: '鶴林寺本堂.mp4',
-      thumb: 'thumb_鶴林寺本堂.jpg',
-      label: '鶴林寺本堂／国宝',
+      file: '鶴林寺本堂.mp4', thumb: 'thumb_鶴林寺本堂.jpg',
+      name: '鶴林寺本堂',
+      group: '国宝　建造物', groupLevel: '国指定文化財',
+      badge: '国宝', badgeClass: 'badge-kokuhо',
+      dotColor: '#c8a429',
+      sub: '国指定文化財｜建造物',
       desc: '薬師如来・日光菩薩・月光菩薩を本尊とし、説法や儀式の場として「大講堂」とも称される。和様に唐様・天竺様を融合した折衷様式（14世紀）の最高峰とされる建築で、内部は内陣と外陣に分かれる。内陣の宮殿には60年に一度のみ開帳される10世紀頃の秘仏5体が安置されており、板戸に描かれた鶴の絵は日本最古とされる。',
       ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
     },
     {
-      file: '鶴林寺太子堂.mp4',
-      thumb: 'thumb_鶴林寺太子堂.jpg',
-      label: '鶴林寺太子堂／国宝',
+      file: '鶴林寺太子堂.mp4', thumb: 'thumb_鶴林寺太子堂.jpg',
+      name: '鶴林寺太子堂',
+      group: '国宝　建造物', groupLevel: '国指定文化財',
+      badge: '国宝', badgeClass: 'badge-kokuhо',
+      dotColor: '#c8a429',
+      sub: '国指定文化財｜建造物',
       desc: '釈迦如来・文殊菩薩・普賢菩薩・四天王を本尊とする兵庫県最古の建築。聖徳太子ゆかりの聖霊院を前身とする天台宗の法華堂で、桧皮葺きの屋根と小組格天井が特徴。昭和51年（1976）の赤外線調査により、九品来迎図・涅槃図・飛天図など創建当時の壁画が発見されたが、今もすすに覆われ肉眼では確認できない。',
       ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
     },
+    // ── 重要文化財　建造物 ──────────────────────
     {
-      file: '鶴林寺鐘楼.mp4',
-      thumb: 'thumb_鶴林寺鐘楼.jpg',
-      label: '鶴林寺鐘楼／国指定重要文化財',
+      file: '鶴林寺鐘楼.mp4', thumb: 'thumb_鶴林寺鐘楼.jpg',
+      name: '鶴林寺鐘楼',
+      group: '重要文化財　建造物', groupLevel: '国指定文化財',
+      badge: '重要文化財', badgeClass: 'badge-jubun',
+      dotColor: '#c0390b',
+      sub: '国指定文化財｜建造物',
       desc: '2階に上って鐘をつく「袴腰造り」と呼ばれる珍しい構造をもつ大型鐘楼。国宝本堂と一連に建立され、均整のとれた美しさで知られる。重要文化財の梵鐘は約1000年前の高麗時代に造られた朝鮮鐘で、「黄鐘調」の澄んだ音色をもつ名鐘として伝わる。',
       ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
     },
+    // ── 史跡 ────────────────────────────────
+    {
+      file: '尼塚古墳.mp4', thumb: 'thumb_尼塚古墳.jpg',
+      name: '尼塚古墳',
+      group: '史跡', groupLevel: '国指定文化財',
+      badge: '国指定史跡', badgeClass: 'badge-shiseki',
+      dotColor: '#2d7a4f',
+      sub: '国指定文化財｜史跡',
+      desc: '5世紀中葉頃に築造された墳長51mの造り出し付き円墳（帆立貝式古墳）で、国史跡「西条古墳群」を構成する3基のひとつ。平成18年（2006）の発掘調査で人塚古墳と類似した構造をもつことが判明し、墳丘からは円筒埴輪列が出土しています。行者塚・人塚・尼塚と続く古墳群全体に共通するのは規模と構造が段階的に縮小していく変遷で、5世紀の東播磨における首長権の移り変わりを読み解く重要な手がかりとなっています。西条廃寺跡と隣接し、現在は史跡公園として整備・公開されています。',
+      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
+    },
+    // ── 市指定文化財　建造物 ──────────────────────
+    {
+      file: '平木橋.mp4', thumb: 'thumb_平木橋.jpg',
+      name: '平木橋',
+      group: '建造物', groupLevel: '市指定文化財',
+      badge: '市指定文化財', badgeClass: 'badge-shitei',
+      dotColor: '#1a5a9a',
+      sub: '市指定文化財｜建造物',
+      desc: '野口町水足の前ノ池に移築保存されている水路橋。花崗岩のアーチと煉瓦の橋壁を組み合わせた構造が特徴で、大正4年（1915）に山田川疏水事業の一環として建造されました。いなみ野台地の農業用水を支えた近代土木遺産として高く評価され、道路建設に伴い平成21年（2009）に現在地へ移築後、市指定文化財に指定されています。',
+      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/sisiteikaisetu/sisiteihirakibasi.html'
+    },
+    // ── 市指定文化財　考古資料 ────────────────────
+    {
+      file: '稚児窟石棺蓋.mp4', thumb: 'thumb_稚児窟石棺蓋.jpg',
+      name: '稚児窟石棺蓋',
+      group: '考古資料', groupLevel: '市指定文化財',
+      badge: '市指定文化財', badgeClass: 'badge-shitei',
+      dotColor: '#1a5a9a',
+      sub: '市指定文化財｜考古資料',
+      desc: '池尻16号墳（稚児窟）に納められていた家形石棺の蓋。地元産の竜山石（流紋岩質溶結凝灰岩）製で、最大長242cmは市内最大級。縄掛突起を6個もち、表面は高度な技術で丁寧に仕上げられています。6世紀末〜7世紀初頭（古墳時代後期〜飛鳥時代初め）の製作とみられ、播磨の古代史とヤマト政権との関係を考えるうえで学術的価値の高い市指定文化財です。',
+      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/sisiteikaisetu/38602.html'
+    },
   ];
 
-  const grid           = document.getElementById('thumb-grid');
-  const playerSection  = document.getElementById('player-section');
-  const mainVideo      = document.getElementById('main-video');
+  const grid            = document.getElementById('thumb-grid');
+  const playerSection   = document.getElementById('player-section');
+  const mainVideo       = document.getElementById('main-video');
   const nowPlayingTitle = document.getElementById('now-playing-title');
-  const tocNav         = document.getElementById('toc-nav');
+  const tocNav          = document.getElementById('toc-nav');
 
   let currentIndex = -1;
 
-  // ===== 目次を生成 =====
+  // ===== 目次を生成（グループ区切り付き）=====
+  let tocPrevGroup = null;
   videos.forEach((v, i) => {
+    // グループが変わったら区切りラベルを挿入
+    if (v.group !== tocPrevGroup) {
+      const sep = document.createElement('span');
+      sep.className = 'toc-item';
+      sep.style.cssText = 'background:transparent;border-color:#333;color:#555;cursor:default;padding:5px 10px;font-size:0.68rem;letter-spacing:0.08em;';
+      sep.textContent = `${v.groupLevel}｜${v.group}`;
+      tocNav.appendChild(sep);
+      tocPrevGroup = v.group;
+    }
+
     const btn = document.createElement('button');
     btn.className = 'toc-item';
-    // ラベルから指定区分（／以降）を省略して短くする
-    const shortLabel = v.label.split('／')[0];
-    btn.textContent = shortLabel;
-    btn.title = v.label;
+    // バッジ色ドット + 名前
+    btn.innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${v.dotColor};margin-right:5px;vertical-align:middle;position:relative;top:-1px;"></span>${v.name}`;
+    btn.title = `${v.badge}｜${v.name}`;
     btn.addEventListener('click', () => {
       const target = document.getElementById(`card-${i}`);
       if (target) {
-        // ヘッダー＋目次の高さ分オフセット
         const offset = 110;
         const top = target.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: 'smooth' });
-        // 軽くハイライト
-        target.style.outline = '2px solid #c8a96e';
+        target.style.outline = `2px solid ${v.dotColor}`;
         setTimeout(() => { target.style.outline = ''; }, 1200);
       }
     });
     tocNav.appendChild(btn);
   });
 
-  // ===== サムネイルカードを生成 =====
-  // 動画インデックス（infoOnlyを除く）
-  let videoIndex = 0;
+  // ===== サムネイルカードを生成（グループヘッダー付き）=====
+  let prevGroup = null;
   videos.forEach((v, i) => {
+    // グループが変わったらヘッダーを挿入
+    if (v.group !== prevGroup) {
+      const header = document.createElement('div');
+      header.className = 'group-header';
+      header.innerHTML = `
+        <div class="group-level">${v.groupLevel}</div>
+        <div class="group-title">
+          <span class="group-dot" style="background:${v.dotColor};"></span>${v.group}
+        </div>`;
+      grid.appendChild(header);
+      prevGroup = v.group;
+    }
+
+    // カード本体
     const card = document.createElement('div');
+    card.className = 'thumb-card';
     card.dataset.index = i;
-    card.id = `card-${i}`; // 目次リンク用ID
+    card.id = `card-${i}`;
 
     const wrapper = document.createElement('div');
     wrapper.className = 'thumb-wrapper';
 
-    if (v.infoOnly) {
-      // ===== 情報のみカード =====
-      card.className = 'thumb-card info-only';
+    // サムネイル画像
+    const img = document.createElement('img');
+    img.className = 'thumb-canvas';
+    img.src = v.thumb || '';
+    img.alt = v.name;
+    wrapper.appendChild(img);
 
-      wrapper.innerHTML = `
-        <div class="info-placeholder">
-          <span>${v.icon || '🏛'}</span>
-          <p>動画なし</p>
-        </div>
-        <span class="info-badge">INFO</span>`;
-    } else {
-      // ===== 動画カード =====
-      card.className = 'thumb-card';
+    // 文化財指定バッジ（左上）
+    const desigBadge = document.createElement('span');
+    desigBadge.className = `desig-badge ${v.badgeClass}`;
+    desigBadge.textContent = v.badge;
+    wrapper.appendChild(desigBadge);
 
-      const overlay = document.createElement('div');
-      overlay.className = 'play-overlay';
-      overlay.innerHTML = `
-        <div class="play-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-            <path d="M8 5v14l11-7z"/>
-          </svg>
-        </div>`;
+    // 再生オーバーレイ
+    const overlay = document.createElement('div');
+    overlay.className = 'play-overlay';
+    overlay.innerHTML = `<div class="play-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div>`;
+    wrapper.appendChild(overlay);
 
-      const badge = document.createElement('span');
-      badge.className = 'live-badge';
-      badge.textContent = 'PLAYING';
+    // PLAYING バッジ（右上）
+    const liveBadge = document.createElement('span');
+    liveBadge.className = 'live-badge';
+    liveBadge.textContent = 'PLAYING';
+    wrapper.appendChild(liveBadge);
 
-      // 静止画サムネイルを使用（全動画共通）
-      const img = document.createElement('img');
-      img.className = 'thumb-canvas';
-      img.src = v.thumb || '';
-      img.alt = v.label;
-      wrapper.appendChild(img);
+    card.appendChild(wrapper);
 
-      wrapper.appendChild(overlay);
-      wrapper.appendChild(badge);
-
-      const vi = videoIndex++;
-      card.addEventListener('click', () => playVideo(i, vi));
-    }
-
+    // テキスト情報
     const info = document.createElement('div');
     info.className = 'thumb-info';
     info.innerHTML = `
-      <div class="thumb-title">${v.label}</div>
-      ${v.file ? `<div class="thumb-sub">${v.file}</div>` : ''}
+      <div class="thumb-title">${v.name}</div>
+      <div class="thumb-sub">${v.sub}</div>
       <div class="thumb-desc">${v.desc}</div>
       <span class="thumb-ref">出典：<a href="${v.ref}" target="_blank" rel="noopener">加古川市文化財調査研究センター</a></span>`;
-
-    card.appendChild(wrapper);
     card.appendChild(info);
+
+    card.addEventListener('click', () => playVideo(i));
     grid.appendChild(card);
   });
 
@@ -759,14 +848,13 @@
 
     currentIndex = index;
     const v = videos[index];
-    if (v.infoOnly) return;
 
     // プレイヤーを表示
     playerSection.classList.add('active');
     mainVideo.src = v.file;
     mainVideo.loop = true;
     mainVideo.play();
-    nowPlayingTitle.textContent = v.label;
+    nowPlayingTitle.textContent = `${v.name}（${v.badge}）`;
 
     // 再生中カードをハイライト
     const card = grid.querySelector(`.thumb-card[data-index="${index}"]`);
