@@ -39,6 +39,72 @@
       letter-spacing: 0.03em;
     }
 
+    /* ======= 目次ナビゲーション ======= */
+    #toc-nav {
+      background: #161616;
+      border-bottom: 1px solid #2a2a2a;
+      padding: 10px 16px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    #toc-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    #toc-nav .toc-label {
+      display: inline-block;
+      font-size: 0.68rem;
+      color: #555;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+
+    .toc-item {
+      display: inline-block;
+      margin-right: 8px;
+      padding: 6px 14px;
+      background: #222;
+      border: 1px solid #333;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      color: #ccc;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      vertical-align: middle;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .toc-item:hover {
+      background: #2e2e2e;
+      color: #fff;
+      border-color: #555;
+    }
+
+    .toc-item:active {
+      background: #c8a96e;
+      color: #000;
+      border-color: #c8a96e;
+    }
+
+    @media (max-width: 600px) {
+      #toc-nav {
+        padding: 8px 12px;
+      }
+      .toc-item {
+        font-size: 0.74rem;
+        padding: 5px 12px;
+      }
+    }
+
     /* ======= Player Area ======= */
     #player-section {
       display: none;
@@ -384,6 +450,12 @@
   <p class="credit">制作：兵庫県立東播工業高等学校 建築科 ファブラボスタジオ（FabLab Studio）</p>
 </header>
 
+<!-- 目次ナビゲーション -->
+<nav id="toc-nav">
+  <span class="toc-label">目次</span>
+  <!-- JavaScriptで動的に生成 -->
+</nav>
+
 <!-- メインプレイヤー -->
 <section id="player-section">
   <video id="main-video" autoplay loop playsinline></video>
@@ -514,8 +586,32 @@
   const playerSection  = document.getElementById('player-section');
   const mainVideo      = document.getElementById('main-video');
   const nowPlayingTitle = document.getElementById('now-playing-title');
+  const tocNav         = document.getElementById('toc-nav');
 
   let currentIndex = -1;
+
+  // ===== 目次を生成 =====
+  videos.forEach((v, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'toc-item';
+    // ラベルから指定区分（／以降）を省略して短くする
+    const shortLabel = v.label.split('／')[0];
+    btn.textContent = shortLabel;
+    btn.title = v.label;
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(`card-${i}`);
+      if (target) {
+        // ヘッダー＋目次の高さ分オフセット
+        const offset = 110;
+        const top = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+        // 軽くハイライト
+        target.style.outline = '2px solid #c8a96e';
+        setTimeout(() => { target.style.outline = ''; }, 1200);
+      }
+    });
+    tocNav.appendChild(btn);
+  });
 
   // ===== サムネイルカードを生成 =====
   // 動画インデックス（infoOnlyを除く）
@@ -523,6 +619,7 @@
   videos.forEach((v, i) => {
     const card = document.createElement('div');
     card.dataset.index = i;
+    card.id = `card-${i}`; // 目次リンク用ID
 
     const wrapper = document.createElement('div');
     wrapper.className = 'thumb-wrapper';
