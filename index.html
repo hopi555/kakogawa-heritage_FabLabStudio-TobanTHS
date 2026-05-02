@@ -40,6 +40,7 @@
     }
 
     /* ======= 目次ナビゲーション ======= */
+    /* ======= 目次 2段レイアウト ======= */
     #toc-wrap {
       position: sticky;
       top: 0;
@@ -49,34 +50,22 @@
     }
 
     #toc-nav {
-      padding: 10px 40px 10px 16px;
+      padding: 8px 48px 8px 16px;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
       white-space: nowrap;
       cursor: grab;
       user-select: none;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
     }
 
-    #toc-nav.dragging {
-      cursor: grabbing;
-    }
+    #toc-nav.dragging { cursor: grabbing; }
+    #toc-nav::-webkit-scrollbar { display: none; }
 
-    #toc-nav::-webkit-scrollbar {
-      display: none;
-    }
-
-    #toc-nav .toc-label {
-      display: inline-block;
-      font-size: 0.68rem;
-      color: #555;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      vertical-align: middle;
-      margin-right: 10px;
-    }
-
-    /* 右端フェードアウト＋スクロールヒント */
+    /* 右端フェードアウト */
     #toc-scroll-hint {
       position: absolute;
       top: 0; right: 0; bottom: 0;
@@ -86,47 +75,58 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      padding-right: 6px;
-      font-size: 0.75rem;
+      padding-right: 8px;
+      font-size: 0.8rem;
       color: #555;
     }
 
-    .toc-item {
-      display: inline-block;
-      margin-right: 8px;
-      padding: 6px 14px;
+    /* グループ列 */
+    .toc-col {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 0 10px;
+      border-right: 1px solid #282828;
+      flex-shrink: 0;
+    }
+    .toc-col:first-child { padding-left: 0; }
+    .toc-col:last-child  { border-right: none; }
+
+    /* 上段：グループ名ラベル */
+    .toc-group-label {
+      font-size: 0.64rem;
+      color: #666;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 0;
+    }
+
+    /* 下段：動画名ボタン */
+    .toc-btn {
+      display: block;
+      padding: 4px 12px;
       background: #222;
       border: 1px solid #333;
-      border-radius: 20px;
-      font-size: 0.78rem;
+      border-radius: 14px;
+      font-size: 0.75rem;
       color: #ccc;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s, border-color 0.2s;
-      vertical-align: middle;
       white-space: nowrap;
+      text-align: center;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
       user-select: none;
     }
-
-    .toc-item:hover {
-      background: #2e2e2e;
-      color: #fff;
-      border-color: #555;
-    }
-
-    .toc-item:active {
-      background: #c8a96e;
-      color: #000;
-      border-color: #c8a96e;
-    }
+    .toc-btn:hover  { background: #2e2e2e; color: #fff; border-color: #555; }
+    .toc-btn:active { color: #000; }
 
     @media (max-width: 600px) {
-      #toc-nav {
-        padding: 8px 12px;
-      }
-      .toc-item {
-        font-size: 0.74rem;
-        padding: 5px 12px;
-      }
+      #toc-nav { padding: 6px 40px 6px 10px; }
+      .toc-col { padding: 0 8px; gap: 3px; }
+      .toc-group-label { font-size: 0.60rem; }
+      .toc-btn { font-size: 0.70rem; padding: 3px 10px; }
     }
 
     /* ======= Player Area ======= */
@@ -744,35 +744,43 @@
 
   let currentIndex = -1;
 
-  // ===== 目次を生成（グループ区切り付き）=====
-  let tocPrevGroup = null;
+  // ===== 目次を生成（上段：グループ名 ／ 下段：動画名ボタン）=====
+  const tocCols = {}; // group → col element
+
   videos.forEach((v, i) => {
-    // グループが変わったら区切りラベルを挿入
-    if (v.group !== tocPrevGroup) {
-      const sep = document.createElement('span');
-      sep.className = 'toc-item';
-      sep.style.cssText = 'background:transparent;border-color:#333;color:#555;cursor:default;padding:5px 10px;font-size:0.68rem;letter-spacing:0.08em;';
-      sep.textContent = `${v.groupLevel}｜${v.group}`;
-      tocNav.appendChild(sep);
-      tocPrevGroup = v.group;
+    // グループ列がなければ作成
+    if (!tocCols[v.group]) {
+      const col = document.createElement('div');
+      col.className = 'toc-col';
+
+      // 上段：グループ名ラベル
+      const label = document.createElement('div');
+      label.className = 'toc-group-label';
+      label.innerHTML = `
+        <span style="width:8px;height:8px;border-radius:2px;background:${v.dotColor};display:inline-block;flex-shrink:0;"></span>
+        <span>${v.groupLevel}<br>${v.group}</span>`;
+      col.appendChild(label);
+
+      tocCols[v.group] = col;
+      tocNav.appendChild(col);
     }
 
+    // 下段：動画名ボタン
     const btn = document.createElement('button');
-    btn.className = 'toc-item';
-    // バッジ色ドット + 名前
-    btn.innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${v.dotColor};margin-right:5px;vertical-align:middle;position:relative;top:-1px;"></span>${v.name}`;
-    btn.title = `${v.badge}｜${v.name}`;
+    btn.className = 'toc-btn';
+    btn.style.borderColor = v.dotColor + '55';
+    btn.textContent = v.name;
     btn.addEventListener('click', () => {
       const target = document.getElementById(`card-${i}`);
       if (target) {
-        const offset = 110;
+        const offset = 120;
         const top = target.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: 'smooth' });
         target.style.outline = `2px solid ${v.dotColor}`;
         setTimeout(() => { target.style.outline = ''; }, 1200);
       }
     });
-    tocNav.appendChild(btn);
+    tocCols[v.group].appendChild(btn);
   });
 
   // ===== サムネイルカードを生成（グループヘッダー付き）=====
