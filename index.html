@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" id="html-root">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,6 +23,7 @@
       padding: 24px 32px 16px;
       border-bottom: 1px solid #222;
       background: #111;
+      position: relative;
     }
 
     header h1 {
@@ -39,7 +40,29 @@
       letter-spacing: 0.03em;
     }
 
-    /* ======= 目次ナビゲーション ======= */
+    #lang-toggle {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      background: transparent;
+      border: 1px solid #444;
+      color: #aaa;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 5px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+
+    #lang-toggle:hover {
+      background: #222;
+      color: #fff;
+      border-color: #666;
+    }
+
+    /* ======= 目次ナビゲーション 2段レイアウト ======= */
     #toc-wrap {
       position: sticky;
       top: 0;
@@ -49,34 +72,21 @@
     }
 
     #toc-nav {
-      padding: 10px 40px 10px 16px;
+      padding: 8px 48px 8px 16px;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
       white-space: nowrap;
       cursor: grab;
       user-select: none;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
     }
 
-    #toc-nav.dragging {
-      cursor: grabbing;
-    }
+    #toc-nav.dragging { cursor: grabbing; }
+    #toc-nav::-webkit-scrollbar { display: none; }
 
-    #toc-nav::-webkit-scrollbar {
-      display: none;
-    }
-
-    #toc-nav .toc-label {
-      display: inline-block;
-      font-size: 0.68rem;
-      color: #555;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      vertical-align: middle;
-      margin-right: 10px;
-    }
-
-    /* 右端フェードアウト＋スクロールヒント */
     #toc-scroll-hint {
       position: absolute;
       top: 0; right: 0; bottom: 0;
@@ -86,47 +96,65 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      padding-right: 6px;
-      font-size: 0.75rem;
+      padding-right: 8px;
+      font-size: 0.8rem;
       color: #555;
     }
 
-    .toc-item {
-      display: inline-block;
-      margin-right: 8px;
-      padding: 6px 14px;
+    .toc-label {
+      font-size: 0.68rem;
+      color: #555;
+      letter-spacing: 0.1em;
+      padding: 0 12px 0 2px;
+      white-space: nowrap;
+      align-self: center;
+      flex-shrink: 0;
+    }
+
+    .toc-col {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 0 10px;
+      border-right: 1px solid #282828;
+      flex-shrink: 0;
+    }
+    .toc-col:first-child { padding-left: 0; }
+    .toc-col:last-child  { border-right: none; }
+
+    .toc-group-label {
+      font-size: 0.64rem;
+      color: #666;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 0;
+    }
+
+    .toc-btn {
+      display: block;
+      padding: 4px 12px;
       background: #222;
       border: 1px solid #333;
-      border-radius: 20px;
-      font-size: 0.78rem;
+      border-radius: 14px;
+      font-size: 0.75rem;
       color: #ccc;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s, border-color 0.2s;
-      vertical-align: middle;
       white-space: nowrap;
+      text-align: center;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
       user-select: none;
     }
-
-    .toc-item:hover {
-      background: #2e2e2e;
-      color: #fff;
-      border-color: #555;
-    }
-
-    .toc-item:active {
-      background: #c8a96e;
-      color: #000;
-      border-color: #c8a96e;
-    }
+    .toc-btn:hover  { background: #2e2e2e; color: #fff; border-color: #555; }
+    .toc-btn:active { color: #000; }
 
     @media (max-width: 600px) {
-      #toc-nav {
-        padding: 8px 12px;
-      }
-      .toc-item {
-        font-size: 0.74rem;
-        padding: 5px 12px;
-      }
+      #toc-nav { padding: 6px 40px 6px 10px; }
+      .toc-col { padding: 0 8px; gap: 3px; }
+      .toc-group-label { font-size: 0.60rem; }
+      .toc-btn { font-size: 0.70rem; padding: 3px 10px; }
     }
 
     /* ======= Player Area ======= */
@@ -161,6 +189,11 @@
     #now-playing-label span {
       color: #fff;
       font-weight: 600;
+    }
+
+    #now-playing-label #now-playing-prefix {
+      color: #aaa;
+      font-weight: 400;
     }
 
     /* ======= Thumbnail Grid ======= */
@@ -218,7 +251,6 @@
       display: block;
     }
 
-    /* Play overlay icon */
     .play-overlay {
       position: absolute;
       inset: 0;
@@ -262,7 +294,6 @@
       margin-left: 4px;
     }
 
-    /* LIVE badge for currently playing */
     .live-badge {
       display: none;
       position: absolute;
@@ -293,13 +324,14 @@
       border-radius: 3px;
       z-index: 2;
       pointer-events: none;
+      line-height: 1.3;
     }
 
-    .badge-kokuhо   { background: #c8a429; color: #1a1a1a; } /* 国宝：金 */
-    .badge-jubun    { background: #c0390b; color: #fff;    } /* 重要文化財：赤橙 */
-    .badge-shiseki  { background: #2d7a4f; color: #fff;    } /* 史跡：緑 */
-    .badge-shitei   { background: #1a5a9a; color: #fff;    } /* 市指定：青 */
-    .badge-touroku  { background: #555;    color: #ddd;    } /* 市登録：グレー */
+    .badge-kokuhо   { background: #c8a429; color: #1a1a1a; }
+    .badge-jubun    { background: #c0390b; color: #fff;    }
+    .badge-shiseki  { background: #2d7a4f; color: #fff;    }
+    .badge-shitei   { background: #1a5a9a; color: #fff;    }
+    .badge-touroku  { background: #555;    color: #ddd;    }
 
     /* ===== グループヘッダー ===== */
     .group-header {
@@ -382,52 +414,6 @@
       text-decoration: underline;
     }
 
-    /* Info-only card (no video) */
-    .thumb-card.info-only {
-      cursor: default;
-    }
-
-    .thumb-card.info-only:hover {
-      transform: none;
-      box-shadow: none;
-      border-color: #333;
-    }
-
-    .info-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #161616;
-      gap: 8px;
-    }
-
-    .info-placeholder span {
-      font-size: 2.4rem;
-    }
-
-    .info-placeholder p {
-      font-size: 0.72rem;
-      color: #555;
-      letter-spacing: 0.06em;
-    }
-
-    .info-badge {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      background: #3a3a3a;
-      color: #aaa;
-      font-size: 0.62rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      padding: 2px 7px;
-      border-radius: 3px;
-    }
-
-    /* Loading spinner on canvas while seeking */
     .thumb-loading {
       position: absolute;
       inset: 0;
@@ -454,12 +440,19 @@
     @media (max-width: 600px) {
       header {
         padding: 16px 16px 12px;
+        padding-right: 84px;
       }
       header h1 {
         font-size: 1.05rem;
       }
       header .credit {
         font-size: 0.7rem;
+      }
+      #lang-toggle {
+        top: 14px;
+        right: 12px;
+        font-size: 0.7rem;
+        padding: 4px 10px;
       }
       #gallery {
         padding: 16px 12px 28px;
@@ -528,34 +521,30 @@
 <body>
 
 <header>
-  <h1>🎬 加古川市の文化遺産・動画ギャラリー</h1>
-  <p class="credit">制作：兵庫県立東播工業高等学校 建築科 ファブラボスタジオ（FabLab Studio）</p>
+  <h1 id="page-title">🎬 加古川市の文化遺産・動画ギャラリー</h1>
+  <p class="credit" id="page-credit">制作：兵庫県立東播工業高等学校 建築科 ファブラボスタジオ（FabLab Studio）</p>
+  <button id="lang-toggle" aria-label="Switch language">EN</button>
 </header>
 
-<!-- 目次ナビゲーション -->
 <div id="toc-wrap">
   <nav id="toc-nav">
-    <span class="toc-label">目次</span>
-    <!-- JavaScriptで動的に生成 -->
+    <!-- generated by JS -->
   </nav>
   <div id="toc-scroll-hint">›</div>
 </div>
 
-<!-- メインプレイヤー -->
 <section id="player-section">
   <video id="main-video" autoplay loop playsinline></video>
-  <div id="now-playing-label">再生中：<span id="now-playing-title">—</span></div>
+  <div id="now-playing-label"><span id="now-playing-prefix">再生中：</span><span id="now-playing-title">—</span></div>
 </section>
 
-<!-- サムネイルギャラリー -->
 <div id="gallery">
-  <h2>動画一覧</h2>
+  <h2 id="gallery-h2">動画一覧</h2>
   <div class="thumb-grid" id="thumb-grid"></div>
 </div>
 
-<!-- 地図 -->
 <div id="map-section">
-  <h2>📍 所在地マップ（加古川市）</h2>
+  <h2 id="map-h2">📍 所在地マップ（加古川市）</h2>
   <div id="map"></div>
 </div>
 
@@ -569,156 +558,218 @@
     maxZoom: 18
   }).addTo(map);
 
-  // マーカー情報（住所から確認した座標をハードコード）
   const spots = [
     {
       lat: 34.76477, lon: 134.86173,
-      label: '🌉 平木橋／市指定文化財',
-      sub: '加古川市野口町水足247',
-      note: '大正4年（1915）建造の水路橋。市指定文化財。'
+      label: '🌉 平木橋／市指定文化財', labelEn: '🌉 Hiraki Bridge / City Cultural Property',
+      sub: '加古川市野口町水足247', subEn: 'Noguchi-cho Mizutari, Kakogawa City',
+      note: '大正4年（1915）建造の水路橋。市指定文化財。',
+      noteEn: 'Masonry aqueduct bridge built 1915 (Taisho 4). City-designated cultural property.'
     },
     {
       lat: 34.79148, lon: 134.85160,
-      label: '🪨 稚児窟石棺蓋／市指定文化財',
-      sub: '加古川市平荘町69',
-      note: '6世紀末〜7世紀初頭の家形石棺蓋。市指定文化財。'
+      label: '🪨 稚児窟石棺蓋／市指定文化財', labelEn: '🪨 Chigokutsu Stone Coffin Lid / City Cultural Property',
+      sub: '加古川市平荘町69', subEn: 'Heiso-cho 69, Kakogawa City',
+      note: '6世紀末〜7世紀初頭の家形石棺蓋。市指定文化財。',
+      noteEn: 'House-shaped stone coffin lid, late 6th–early 7th century. City-designated cultural property.'
     },
     {
       lat: 34.78159, lon: 134.88669,
-      label: '🏛 尼塚古墳／国指定史跡',
-      sub: '加古川市西条古墳群',
-      note: '5世紀中葉頃築造の帆立貝式古墳。国指定史跡・西条古墳群のひとつ。'
+      label: '🏛 尼塚古墳／国指定史跡', labelEn: '🏛 Amanozuka Burial Mound / National Historic Site',
+      sub: '加古川市西条古墳群', subEn: 'Saijo Kofun Cluster, Kakogawa City',
+      note: '5世紀中葉頃築造の帆立貝式古墳。国指定史跡・西条古墳群のひとつ。',
+      noteEn: 'Scallop-shell style kofun, mid-5th century. Part of the nationally designated Saijo Kofun Historic Site.'
     },
     {
       lat: 34.75228, lon: 134.83261,
-      label: '⛩ 鶴林寺本堂／国宝',
-      sub: '加古川市加古川町北在家424',
-      note: '14世紀建立の折衷様式建築。国宝。'
+      label: '⛩ 鶴林寺本堂／国宝', labelEn: '⛩ Kakurinji Temple Main Hall / National Treasure',
+      sub: '加古川市加古川町北在家424', subEn: 'Kitaizai 424, Kakogawa-cho, Kakogawa City',
+      note: '14世紀建立の折衷様式建築。国宝。',
+      noteEn: '14th-century eclectic-style Buddhist architecture. National Treasure.'
     },
     {
       lat: 34.75213, lon: 134.83283,
-      label: '⛩ 鶴林寺太子堂／国宝',
-      sub: '加古川市加古川町北在家424',
-      note: '兵庫県最古の建築。天台宗の法華堂。国宝。'
+      label: '⛩ 鶴林寺太子堂／国宝', labelEn: '⛩ Kakurinji Temple Taishi-do Hall / National Treasure',
+      sub: '加古川市加古川町北在家424', subEn: 'Kitaizai 424, Kakogawa-cho, Kakogawa City',
+      note: '兵庫県最古の建築。天台宗の法華堂。国宝。',
+      noteEn: 'Oldest surviving building in Hyogo Prefecture. Tendai Buddhist Hokke-do hall. National Treasure.'
     },
     {
       lat: 34.75231, lon: 134.83292,
-      label: '🔔 鶴林寺鐘楼／国指定重要文化財',
-      sub: '加古川市加古川町北在家424',
-      note: '袴腰造りの大型鐘楼。高麗時代の朝鮮鐘を所蔵。重要文化財。'
+      label: '🔔 鶴林寺鐘楼／国指定重要文化財', labelEn: '🔔 Kakurinji Temple Bell Tower / Important Cultural Property',
+      sub: '加古川市加古川町北在家424', subEn: 'Kitaizai 424, Kakogawa-cho, Kakogawa City',
+      note: '袴腰造りの大型鐘楼。高麗時代の朝鮮鐘を所蔵。重要文化財。',
+      noteEn: 'Large bell tower (hakamakoshi style). Houses a Goryeo-dynasty Korean bell. Important Cultural Property.'
     },
     {
       lat: 34.77470, lon: 134.82831,
-      label: '📜 七騎塚の碑／市登録文化財',
-      sub: '加古川市加古川町本町（大師堂境内）',
-      note: '南北朝時代（1341年）に主君のため討死した7騎を顕彰。文化10年（1813年）建立。市登録文化財。'
+      label: '📜 七騎塚の碑／市登録文化財', labelEn: '📜 Shichikizuka Monument / City-Registered Cultural Property',
+      sub: '加古川市加古川町本町（大師堂境内）', subEn: 'Daishi-do Temple Precinct, Honmachi, Kakogawa City',
+      note: '南北朝時代（1341年）に主君のため討死した7騎を顕彰。文化10年（1813年）建立。市登録文化財。',
+      noteEn: 'Erected 1813 to honor 7 warriors who died for their lord in 1341. City-registered cultural property.'
     }
   ];
 
-  const bounds = spots.map(s => [s.lat, s.lon]);
+  const mapBounds = spots.map(s => [s.lat, s.lon]);
+  const mapMarkers = [];
 
   spots.forEach((spot, i) => {
     const marker = L.marker([spot.lat, spot.lon]).addTo(map);
-    marker.bindPopup(`
-      <div style="font-family:'Hiragino Kaku Gothic Pro','Meiryo',sans-serif;min-width:190px;">
-        <strong style="font-size:1rem;">${spot.label}</strong><br>
-        <span style="font-size:0.8rem;color:#666;">${spot.sub}</span><br>
-        <span style="font-size:0.78rem;margin-top:4px;display:block;">${spot.note}</span>
-      </div>
-    `);
+    marker.bindPopup('');
+    mapMarkers.push({ marker, spot });
     if (i === 0) marker.openPopup();
   });
 
-  map.fitBounds(bounds, { padding: [60, 60] });
+  map.fitBounds(mapBounds, { padding: [60, 60] });
 
-  // ===== 動画ファイルリスト（文化財区分順）=====
+  function updateMapPopups() {
+    mapMarkers.forEach(({ marker, spot }) => {
+      const label = currentLang === 'en' ? (spot.labelEn || spot.label) : spot.label;
+      const sub   = currentLang === 'en' ? (spot.subEn   || spot.sub)   : spot.sub;
+      const note  = currentLang === 'en' ? (spot.noteEn  || spot.note)  : spot.note;
+      marker.setPopupContent(`
+        <div style="font-family:'Hiragino Kaku Gothic Pro','Meiryo',sans-serif;min-width:190px;">
+          <strong style="font-size:1rem;">${label}</strong><br>
+          <span style="font-size:0.8rem;color:#666;">${sub}</span><br>
+          <span style="font-size:0.78rem;margin-top:4px;display:block;">${note}</span>
+        </div>
+      `);
+    });
+  }
+
+  // ===== 動画ファイルリスト =====
   const videos = [
     // ── 国宝　建造物 ──────────────────────────
     {
       file: '鶴林寺本堂.mp4', thumb: 'thumb_鶴林寺本堂.jpg',
-      name: '鶴林寺本堂',
-      group: '国宝　建造物', groupLevel: '国指定文化財',
-      badge: '国宝', badgeClass: 'badge-kokuhо',
-      dotColor: '#c8a429',
-      sub: '国指定文化財｜建造物',
+      name: '鶴林寺本堂',         nameEn: 'Kakurinji Temple Main Hall',
+      group: '国宝　建造物',       groupEn: 'National Treasure — Architecture',
+      groupLevel: '国指定文化財',  groupLevelEn: 'Nationally Designated Cultural Property',
+      badge: '国宝',               badgeEn: 'National Treasure',
+      badgeClass: 'badge-kokuhо',  dotColor: '#c8a429',
+      sub: '国指定文化財｜建造物', subEn: 'National Treasure | Architecture',
       desc: '薬師如来・日光菩薩・月光菩薩を本尊とし、説法や儀式の場として「大講堂」とも称される。和様に唐様・天竺様を融合した折衷様式（14世紀）の最高峰とされる建築で、内部は内陣と外陣に分かれる。内陣の宮殿には60年に一度のみ開帳される10世紀頃の秘仏5体が安置されており、板戸に描かれた鶴の絵は日本最古とされる。',
-      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
+      descEn: 'Also known as the "Great Lecture Hall," this hall enshrines Yakushi Nyorai (Medicine Buddha) as its principal image. A 14th-century masterpiece blending Japanese (Wayō), Chinese (Karayō), and Indian (Tenjikuyō) architectural styles, its interior is divided into inner and outer sanctuaries. The inner sanctuary houses five secret statues from the 10th century, opened only once every 60 years. The crane paintings on its wooden door panels are the oldest known in Japan.',
+      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/kunisiteikaisetu/kokuhoukakurinjihondou.html'
     },
     {
       file: '鶴林寺太子堂.mp4', thumb: 'thumb_鶴林寺太子堂.jpg',
-      name: '鶴林寺太子堂',
-      group: '国宝　建造物', groupLevel: '国指定文化財',
-      badge: '国宝', badgeClass: 'badge-kokuhо',
-      dotColor: '#c8a429',
-      sub: '国指定文化財｜建造物',
+      name: '鶴林寺太子堂',        nameEn: 'Kakurinji Temple Taishi-do Hall',
+      group: '国宝　建造物',        groupEn: 'National Treasure — Architecture',
+      groupLevel: '国指定文化財',   groupLevelEn: 'Nationally Designated Cultural Property',
+      badge: '国宝',                badgeEn: 'National Treasure',
+      badgeClass: 'badge-kokuhо',   dotColor: '#c8a429',
+      sub: '国指定文化財｜建造物',  subEn: 'National Treasure | Architecture',
       desc: '釈迦如来・文殊菩薩・普賢菩薩・四天王を本尊とする兵庫県最古の建築。聖徳太子ゆかりの聖霊院を前身とする天台宗の法華堂で、桧皮葺きの屋根と小組格天井が特徴。昭和51年（1976）の赤外線調査により、九品来迎図・涅槃図・飛天図など創建当時の壁画が発見されたが、今もすすに覆われ肉眼では確認できない。',
-      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
+      descEn: "The oldest surviving building in Hyogo Prefecture, enshrining Shakyamuni Buddha and attendants. Originally dedicated to Prince Shotoku, this Tendai Buddhist Hokke-do features a cypress-bark roof and a coffered ceiling. Infrared photography in 1976 revealed original wall paintings — including a Kubon Raigo, a Parinirvana scene, and celestial beings — but they remain hidden to the naked eye beneath centuries of soot.",
+      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/kunisiteikaisetu/kokuhoukakurinjitaisidou.html'
     },
     // ── 重要文化財　建造物 ──────────────────────
     {
       file: '鶴林寺鐘楼.mp4', thumb: 'thumb_鶴林寺鐘楼.jpg',
-      name: '鶴林寺鐘楼',
-      group: '重要文化財　建造物', groupLevel: '国指定文化財',
-      badge: '重要文化財', badgeClass: 'badge-jubun',
-      dotColor: '#c0390b',
-      sub: '国指定文化財｜建造物',
+      name: '鶴林寺鐘楼',            nameEn: 'Kakurinji Temple Bell Tower',
+      group: '重要文化財　建造物',    groupEn: 'Important Cultural Property — Architecture',
+      groupLevel: '国指定文化財',     groupLevelEn: 'Nationally Designated Cultural Property',
+      badge: '重要文化財',            badgeEn: 'Imp. Cultural Prop.',
+      badgeClass: 'badge-jubun',      dotColor: '#c0390b',
+      sub: '国指定文化財｜建造物',    subEn: 'Important Cultural Property | Architecture',
       desc: '2階に上って鐘をつく「袴腰造り」と呼ばれる珍しい構造をもつ大型鐘楼。国宝本堂と一連に建立され、均整のとれた美しさで知られる。重要文化財の梵鐘は約1000年前の高麗時代に造られた朝鮮鐘で、「黄鐘調」の澄んだ音色をもつ名鐘として伝わる。',
-      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
+      descEn: 'A large bell tower featuring the rare "hakamakoshi" construction, where one climbs to the second floor to ring the bell. Built alongside the National Treasure Main Hall, it is admired for its elegant proportions. Its Important Cultural Property temple bell was cast in Korea during the Goryeo dynasty (~1,000 years ago) and is renowned for its clear, resonant tone.',
+      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/kunisiteikaisetu/kunisiteikakurinjishourou.html'
     },
     // ── 史跡 ────────────────────────────────
     {
       file: '尼塚古墳.mp4', thumb: 'thumb_尼塚古墳.jpg',
-      name: '尼塚古墳',
-      group: '史跡', groupLevel: '国指定文化財',
-      badge: '国指定史跡', badgeClass: 'badge-shiseki',
-      dotColor: '#2d7a4f',
-      sub: '国指定文化財｜史跡',
+      name: '尼塚古墳',              nameEn: 'Amanozuka Burial Mound',
+      group: '史跡',                 groupEn: 'Historic Site',
+      groupLevel: '国指定文化財',    groupLevelEn: 'Nationally Designated Cultural Property',
+      badge: '国指定史跡',           badgeEn: "Nat'l Historic Site",
+      badgeClass: 'badge-shiseki',   dotColor: '#2d7a4f',
+      sub: '国指定文化財｜史跡',     subEn: 'National Historic Site | Burial Mound',
       desc: '5世紀中葉頃に築造された墳長51mの造り出し付き円墳（帆立貝式古墳）で、国史跡「西条古墳群」を構成する3基のひとつ。平成18年（2006）の発掘調査で人塚古墳と類似した構造をもつことが判明し、墳丘からは円筒埴輪列が出土しています。行者塚・人塚・尼塚と続く古墳群全体に共通するのは規模と構造が段階的に縮小していく変遷で、5世紀の東播磨における首長権の移り変わりを読み解く重要な手がかりとなっています。西条廃寺跡と隣接し、現在は史跡公園として整備・公開されています。',
-      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/index.html'
+      descEn: 'A scallop-shell style burial mound (51 m total length) built around the mid-5th century, and one of three mounds forming the nationally designated Saijo Kofun Historic Site. Excavations in 2006 revealed structural similarities to the nearby Hitozuka mound, and a row of cylindrical haniwa figures was unearthed. The cluster illustrates a progressive reduction in scale across generations — key evidence for the shifting of chieftain power in eastern Harima during the 5th century. Now maintained as a historic park adjacent to the Saijo-ji Temple ruins.',
+      ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/kunisiteikaisetu/kunisiteisaijoukofungun.html',
+      refLabel: '加古川市文化財調査研究センター（西条古墳群）',
+      refLabelEn: 'Kakogawa City Cultural Properties Research Center (Saijo Kofun Cluster)'
     },
     // ── 市指定文化財　建造物 ──────────────────────
     {
       file: '平木橋.mp4', thumb: 'thumb_平木橋.jpg',
-      name: '平木橋',
-      group: '建造物', groupLevel: '市指定文化財',
-      badge: '市指定文化財', badgeClass: 'badge-shitei',
-      dotColor: '#1a5a9a',
-      sub: '市指定文化財｜建造物',
+      name: '平木橋',                nameEn: 'Hiraki Bridge',
+      group: '建造物',               groupEn: 'Architecture',
+      groupLevel: '市指定文化財',    groupLevelEn: 'City-Designated Cultural Property',
+      badge: '市指定文化財',         badgeEn: 'City Designated',
+      badgeClass: 'badge-shitei',    dotColor: '#1a5a9a',
+      sub: '市指定文化財｜建造物',   subEn: 'City-Designated Cultural Property | Architecture',
       desc: '野口町水足の前ノ池に移築保存されている水路橋。花崗岩のアーチと煉瓦の橋壁を組み合わせた構造が特徴で、大正4年（1915）に山田川疏水事業の一環として建造されました。いなみ野台地の農業用水を支えた近代土木遺産として高く評価され、道路建設に伴い平成21年（2009）に現在地へ移築後、市指定文化財に指定されています。',
+      descEn: 'A masonry aqueduct bridge now preserved at Maenoke Pond, Noguchi-cho. Notable for its combination of granite arches and brick side walls, it was built in 1915 as part of the Yamada River irrigation project. Highly regarded as a modern civil-engineering heritage that supplied agricultural water to the Inami plateau, it was relocated to its current site in 2009 and subsequently designated as a city-level cultural property.',
       ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/sisiteikaisetu/sisiteihirakibasi.html'
     },
     // ── 市指定文化財　考古資料 ────────────────────
     {
       file: '稚児窟石棺蓋.mp4', thumb: 'thumb_稚児窟石棺蓋.jpg',
-      name: '稚児窟石棺蓋',
-      group: '考古資料', groupLevel: '市指定文化財',
-      badge: '市指定文化財', badgeClass: 'badge-shitei',
-      dotColor: '#1a5a9a',
-      sub: '市指定文化財｜考古資料',
+      name: '稚児窟石棺蓋',           nameEn: 'Chigokutsu Stone Coffin Lid',
+      group: '考古資料',              groupEn: 'Archaeological Material',
+      groupLevel: '市指定文化財',     groupLevelEn: 'City-Designated Cultural Property',
+      badge: '市指定文化財',          badgeEn: 'City Designated',
+      badgeClass: 'badge-shitei',     dotColor: '#1a5a9a',
+      sub: '市指定文化財｜考古資料',  subEn: 'City-Designated Cultural Property | Archaeology',
       desc: '池尻16号墳（稚児窟）に納められていた家形石棺の蓋。地元産の竜山石（流紋岩質溶結凝灰岩）製で、最大長242cmは市内最大級。縄掛突起を6個もち、表面は高度な技術で丁寧に仕上げられています。6世紀末〜7世紀初頭（古墳時代後期〜飛鳥時代初め）の製作とみられ、播磨の古代史とヤマト政権との関係を考えるうえで学術的価値の高い市指定文化財です。',
+      descEn: 'The lid of a house-shaped stone coffin from Burial Mound No. 16 (Chigokutsu). Made from locally quarried Tatsuyama stone (rhyolitic welded tuff), it measures 242 cm — the largest in the city. It has six rope-hanging projections (nawakake-totsuki) and a carefully finished surface. Dating to the late 6th–early 7th century, it is of high scholarly value for understanding ancient Harima and its ties to the Yamato court.',
       ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/sisiteikaisetu/38602.html'
     },
     // ── 市登録文化財　歴史資料 ────────────────────
     {
       file: 'sitikitsuka-no-hi.mp4', thumb: 'thumb_七騎塚の碑.jpg',
-      name: '七騎塚の碑',
-      group: '歴史資料', groupLevel: '市登録文化財',
-      badge: '市登録文化財', badgeClass: 'badge-touroku',
-      dotColor: '#777',
-      sub: '市登録文化財｜歴史資料',
+      name: '七騎塚の碑',              nameEn: 'Shichikizuka Monument',
+      group: '歴史資料',               groupEn: 'Historical Record',
+      groupLevel: '市登録文化財',      groupLevelEn: 'City-Registered Cultural Property',
+      badge: '市登録文化財',           badgeEn: 'City Registered',
+      badgeClass: 'badge-touroku',     dotColor: '#777',
+      sub: '市登録文化財｜歴史資料',   subEn: 'City-Registered Cultural Property | Historical Record',
       desc: '南北朝時代初頭（暦応4年・1341年）、主君・塩冶高貞を追手から逃がすべく加古川のほとりで討死した7騎の武者を顕彰する石碑。弟・重貞をはじめ木村・淵名・眞島・山中・平田ら6名が命を投じ、その忠節を哀れんだ地元の人々が各々の塚を築いて「七騎塚」と呼んだが、洪水と近代の河川改修により現在は全て失われている。石碑は文化10年（1813年）に西国街道（山陽道）沿いに建立。表文は幕府儒学者・古賀精里、碑陰文と書は頼山陽の父・頼春水が担う。その後、河川改修工事に伴い現在の大師堂境内に移設。江戸時代の地誌や名所案内にも「七騎塚」として記され、優れた文章と書で加古川の歴史を伝える文化史的価値をもつ歴史資料。',
+      descEn: "A stone monument honoring seven warriors who died along the Kakogawa River in 1341, sacrificing themselves so their lord Shionoya Takasada could escape his pursuers. Though the seven grave mounds known as 'Shichikizuka' were lost to floods and river works, this stele was erected in 1813 along the Saigoku Road. The main inscription was composed by Koga Seiri, a Confucian scholar of the Shogunate; the reverse text and calligraphy are by Rai Shunsui, father of the historian Rai Sanyo. Later moved to the Daishi-do temple precinct, the monument is valued as a cultural-historical record of Kakogawa's past.",
       ref: 'https://www.city.kakogawa.lg.jp/soshikikarasagasu/kyouiku/kakuka/kyoikushidobu/bunkazai_cyosa/bunkazai/sitourokukaisetu_1/50021.html'
     },
   ];
 
-  const grid            = document.getElementById('thumb-grid');
-  const playerSection   = document.getElementById('player-section');
-  const mainVideo       = document.getElementById('main-video');
-  const nowPlayingTitle = document.getElementById('now-playing-title');
-  const tocNav          = document.getElementById('toc-nav');
-  const tocHint         = document.getElementById('toc-scroll-hint');
+  const grid             = document.getElementById('thumb-grid');
+  const playerSection    = document.getElementById('player-section');
+  const mainVideo        = document.getElementById('main-video');
+  const nowPlayingTitle  = document.getElementById('now-playing-title');
+  const nowPlayingPrefix = document.getElementById('now-playing-prefix');
+  const tocNav           = document.getElementById('toc-nav');
+  const tocHint          = document.getElementById('toc-scroll-hint');
 
-  // ===== 目次：マウスドラッグでスクロール（PC対応）=====
+  // ===== 言語設定 =====
+  let currentLang = 'ja';
+
+  const ui = {
+    ja: {
+      title:      '🎬 加古川市の文化遺産・動画ギャラリー',
+      credit:     '制作：兵庫県立東播工業高等学校 建築科 ファブラボスタジオ（FabLab Studio）',
+      tocLabel:   '目次',
+      galleryH2:  '動画一覧',
+      mapH2:      '📍 所在地マップ（加古川市）',
+      nowPlaying: '再生中：',
+      refPrefix:  '出典：',
+      refDefault: '加古川市文化財調査研究センター',
+      langBtn:    'EN',
+    },
+    en: {
+      title:      '🎬 Cultural Heritage Video Gallery — Kakogawa City',
+      credit:     'Produced by: FabLab Studio, Architecture Dept., Hyogo Pref. Toban Technical High School',
+      tocLabel:   'Contents',
+      galleryH2:  'VIDEO LIBRARY',
+      mapH2:      '📍 Location Map (Kakogawa City)',
+      nowPlaying: 'Now Playing: ',
+      refPrefix:  'Source: ',
+      refDefault: 'Kakogawa City Cultural Properties Research Center',
+      langBtn:    'JA',
+    }
+  };
+
+  // ===== 目次：ドラッグスクロール（PC対応）=====
   let isDragging = false, dragStartX = 0, dragScrollLeft = 0;
   tocNav.addEventListener('mousedown', e => {
     isDragging = true;
@@ -736,7 +787,6 @@
     const x = e.pageX - tocNav.offsetLeft;
     tocNav.scrollLeft = dragScrollLeft - (x - dragStartX);
   });
-  // スクロール末尾に達したらヒントを隠す
   tocNav.addEventListener('scroll', () => {
     const atEnd = tocNav.scrollLeft + tocNav.clientWidth >= tocNav.scrollWidth - 4;
     tocHint.style.opacity = atEnd ? '0' : '1';
@@ -744,173 +794,153 @@
 
   let currentIndex = -1;
 
-  // ===== 目次を生成（グループ区切り付き）=====
-  let tocPrevGroup = null;
-  videos.forEach((v, i) => {
-    // グループが変わったら区切りラベルを挿入
-    if (v.group !== tocPrevGroup) {
-      const sep = document.createElement('span');
-      sep.className = 'toc-item';
-      sep.style.cssText = 'background:transparent;border-color:#333;color:#555;cursor:default;padding:5px 10px;font-size:0.68rem;letter-spacing:0.08em;';
-      sep.textContent = `${v.groupLevel}｜${v.group}`;
-      tocNav.appendChild(sep);
-      tocPrevGroup = v.group;
-    }
+  // ===== 全体再描画（言語切替時に呼ぶ）=====
+  function renderAll() {
+    const lang = currentLang;
+    const u = ui[lang];
 
-    const btn = document.createElement('button');
-    btn.className = 'toc-item';
-    // バッジ色ドット + 名前
-    btn.innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${v.dotColor};margin-right:5px;vertical-align:middle;position:relative;top:-1px;"></span>${v.name}`;
-    btn.title = `${v.badge}｜${v.name}`;
-    btn.addEventListener('click', () => {
-      const target = document.getElementById(`card-${i}`);
-      if (target) {
-        const offset = 110;
-        const top = target.getBoundingClientRect().top + window.scrollY - offset;
-        window.scrollTo({ top, behavior: 'smooth' });
-        target.style.outline = `2px solid ${v.dotColor}`;
-        setTimeout(() => { target.style.outline = ''; }, 1200);
+    // 静的テキスト
+    document.getElementById('html-root').lang = lang;
+    document.title = u.title.replace('🎬 ', '');
+    document.getElementById('page-title').textContent = u.title;
+    document.getElementById('page-credit').textContent = u.credit;
+    document.getElementById('gallery-h2').textContent = u.galleryH2;
+    document.getElementById('map-h2').textContent = u.mapH2;
+    document.getElementById('lang-toggle').textContent = u.langBtn;
+    nowPlayingPrefix.textContent = u.nowPlaying;
+
+    // 目次を再生成
+    tocNav.innerHTML = `<span class="toc-label">${u.tocLabel}</span>`;
+    const tocCols = {};
+
+    videos.forEach((v, i) => {
+      const groupKey  = v.group;
+      const dispGroup = lang === 'en' ? (v.groupEn      || v.group)      : v.group;
+      const dispLevel = lang === 'en' ? (v.groupLevelEn || v.groupLevel) : v.groupLevel;
+      const dispName  = lang === 'en' ? (v.nameEn       || v.name)       : v.name;
+
+      if (!tocCols[groupKey]) {
+        const col = document.createElement('div');
+        col.className = 'toc-col';
+        const label = document.createElement('div');
+        label.className = 'toc-group-label';
+        label.innerHTML = `
+          <span style="width:8px;height:8px;border-radius:2px;background:${v.dotColor};display:inline-block;flex-shrink:0;"></span>
+          <span>${dispLevel}<br>${dispGroup}</span>`;
+        col.appendChild(label);
+        tocCols[groupKey] = col;
+        tocNav.appendChild(col);
       }
+
+      const btn = document.createElement('button');
+      btn.className = 'toc-btn';
+      btn.style.borderColor = v.dotColor + '55';
+      btn.textContent = dispName;
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(`card-${i}`);
+        if (target) {
+          const top = target.getBoundingClientRect().top + window.scrollY - 120;
+          window.scrollTo({ top, behavior: 'smooth' });
+          target.style.outline = `2px solid ${v.dotColor}`;
+          setTimeout(() => { target.style.outline = ''; }, 1200);
+        }
+      });
+      tocCols[groupKey].appendChild(btn);
     });
-    tocNav.appendChild(btn);
-  });
 
-  // ===== サムネイルカードを生成（グループヘッダー付き）=====
-  let prevGroup = null;
-  videos.forEach((v, i) => {
-    // グループが変わったらヘッダーを挿入
-    if (v.group !== prevGroup) {
-      const header = document.createElement('div');
-      header.className = 'group-header';
-      header.innerHTML = `
-        <div class="group-level">${v.groupLevel}</div>
-        <div class="group-title">
-          <span class="group-dot" style="background:${v.dotColor};"></span>${v.group}
-        </div>`;
-      grid.appendChild(header);
-      prevGroup = v.group;
-    }
+    // カードグリッドを再生成
+    grid.innerHTML = '';
+    let prevGroup = null;
 
-    // カード本体
-    const card = document.createElement('div');
-    card.className = 'thumb-card';
-    card.dataset.index = i;
-    card.id = `card-${i}`;
+    videos.forEach((v, i) => {
+      const dispGroup  = lang === 'en' ? (v.groupEn      || v.group)      : v.group;
+      const dispLevel  = lang === 'en' ? (v.groupLevelEn || v.groupLevel) : v.groupLevel;
+      const dispName   = lang === 'en' ? (v.nameEn       || v.name)       : v.name;
+      const dispSub    = lang === 'en' ? (v.subEn        || v.sub)        : v.sub;
+      const dispDesc   = lang === 'en' ? (v.descEn       || v.desc)       : v.desc;
+      const dispBadge  = lang === 'en' ? (v.badgeEn      || v.badge)      : v.badge;
+      const dispRef    = lang === 'en'
+        ? (v.refLabelEn || u.refDefault)
+        : (v.refLabel   || u.refDefault);
 
-    const wrapper = document.createElement('div');
-    wrapper.className = 'thumb-wrapper';
-
-    // サムネイル画像
-    const img = document.createElement('img');
-    img.className = 'thumb-canvas';
-    img.src = v.thumb || '';
-    img.alt = v.name;
-    wrapper.appendChild(img);
-
-    // 文化財指定バッジ（左上）
-    const desigBadge = document.createElement('span');
-    desigBadge.className = `desig-badge ${v.badgeClass}`;
-    desigBadge.textContent = v.badge;
-    wrapper.appendChild(desigBadge);
-
-    // 再生オーバーレイ
-    const overlay = document.createElement('div');
-    overlay.className = 'play-overlay';
-    overlay.innerHTML = `<div class="play-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div>`;
-    wrapper.appendChild(overlay);
-
-    // PLAYING バッジ（右上）
-    const liveBadge = document.createElement('span');
-    liveBadge.className = 'live-badge';
-    liveBadge.textContent = 'PLAYING';
-    wrapper.appendChild(liveBadge);
-
-    card.appendChild(wrapper);
-
-    // テキスト情報
-    const info = document.createElement('div');
-    info.className = 'thumb-info';
-    info.innerHTML = `
-      <div class="thumb-title">${v.name}</div>
-      <div class="thumb-sub">${v.sub}</div>
-      <div class="thumb-desc">${v.desc}</div>
-      <span class="thumb-ref">出典：<a href="${v.ref}" target="_blank" rel="noopener">加古川市文化財調査研究センター</a></span>`;
-    card.appendChild(info);
-
-    card.addEventListener('click', () => playVideo(i));
-    grid.appendChild(card);
-  });
-
-  // ===== 黒フレームかどうかを判定 =====
-  function isBlackFrame(canvas) {
-    try {
-      const ctx = canvas.getContext('2d');
-      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-      let total = 0;
-      // 100ピクセルをサンプリングして平均輝度を計算
-      const step = Math.floor(data.length / 400);
-      let count = 0;
-      for (let i = 0; i < data.length; i += step * 4) {
-        total += data[i] + data[i + 1] + data[i + 2];
-        count++;
+      if (v.group !== prevGroup) {
+        const header = document.createElement('div');
+        header.className = 'group-header';
+        header.innerHTML = `
+          <div class="group-level">${dispLevel}</div>
+          <div class="group-title">
+            <span class="group-dot" style="background:${v.dotColor};"></span>${dispGroup}
+          </div>`;
+        grid.appendChild(header);
+        prevGroup = v.group;
       }
-      const avg = total / (count * 3);
-      return avg < 10; // 平均輝度が10未満なら黒と判定
-    } catch (e) {
-      return false;
+
+      const card = document.createElement('div');
+      card.className = 'thumb-card';
+      card.dataset.index = i;
+      card.id = `card-${i}`;
+      if (i === currentIndex) card.classList.add('playing');
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'thumb-wrapper';
+
+      const img = document.createElement('img');
+      img.className = 'thumb-canvas';
+      img.src = v.thumb || '';
+      img.alt = dispName;
+      wrapper.appendChild(img);
+
+      const desigBadge = document.createElement('span');
+      desigBadge.className = `desig-badge ${v.badgeClass}`;
+      desigBadge.textContent = dispBadge;
+      wrapper.appendChild(desigBadge);
+
+      const overlay = document.createElement('div');
+      overlay.className = 'play-overlay';
+      overlay.innerHTML = `<div class="play-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div>`;
+      wrapper.appendChild(overlay);
+
+      const liveBadge = document.createElement('span');
+      liveBadge.className = 'live-badge';
+      liveBadge.textContent = 'PLAYING';
+      wrapper.appendChild(liveBadge);
+
+      card.appendChild(wrapper);
+
+      const info = document.createElement('div');
+      info.className = 'thumb-info';
+      info.innerHTML = `
+        <div class="thumb-title">${dispName}</div>
+        <div class="thumb-sub">${dispSub}</div>
+        <div class="thumb-desc">${dispDesc}</div>
+        <span class="thumb-ref">${u.refPrefix}<a href="${v.ref}" target="_blank" rel="noopener">${dispRef}</a></span>`;
+      card.appendChild(info);
+
+      card.addEventListener('click', () => playVideo(i));
+      grid.appendChild(card);
+    });
+
+    // 再生中タイトルを更新
+    if (currentIndex !== -1) {
+      const v = videos[currentIndex];
+      const n = lang === 'en' ? (v.nameEn  || v.name)  : v.name;
+      const b = lang === 'en' ? (v.badgeEn || v.badge) : v.badge;
+      nowPlayingTitle.textContent = lang === 'en' ? `${n} (${b})` : `${n}（${b}）`;
     }
+
+    updateMapPopups();
   }
 
-  // ===== 動画からフレームをキャプチャしてcanvasに描画 =====
-  function captureThumb(file, canvas, loadDiv) {
-    const tmpVideo = document.createElement('video');
-    tmpVideo.src = file;
-    tmpVideo.muted = true;
-    tmpVideo.playsInline = true;
-    tmpVideo.preload = 'metadata';
-    tmpVideo.crossOrigin = 'anonymous';
-
-    // 試みるシーク位置（duration の割合）
-    const seekPoints = [0.1, 0.2, 0.35, 0.5, 0.65];
-    let attemptIndex = 0;
-
-    function drawFrame() {
-      const w = 480, h = 270;
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(tmpVideo, 0, 0, w, h);
-
-      if (isBlackFrame(canvas) && attemptIndex < seekPoints.length - 1) {
-        // 黒フレームなら次の位置を試みる
-        attemptIndex++;
-        tmpVideo.currentTime = tmpVideo.duration * seekPoints[attemptIndex];
-        return; // seeked イベントで再試行
-      }
-
-      // 黒でない、または試行回数上限 → 表示確定
-      loadDiv.style.display = 'none';
-      canvas.style.display = 'block';
-      tmpVideo.src = ''; // メモリ解放
-    }
-
-    tmpVideo.addEventListener('loadedmetadata', () => {
-      tmpVideo.currentTime = tmpVideo.duration * seekPoints[0];
-    });
-
-    tmpVideo.addEventListener('seeked', drawFrame);
-
-    tmpVideo.addEventListener('error', () => {
-      // エラー時は代替表示
-      loadDiv.innerHTML = '<span style="color:#555;font-size:0.75rem;">preview<br>unavailable</span>';
-    });
-  }
+  // ===== 言語トグル =====
+  document.getElementById('lang-toggle').addEventListener('click', () => {
+    currentLang = currentLang === 'ja' ? 'en' : 'ja';
+    renderAll();
+  });
 
   // ===== 動画を再生 =====
   function playVideo(index) {
     if (index === currentIndex) return;
 
-    // 以前のカードのハイライトを解除
     if (currentIndex !== -1) {
       const prev = grid.querySelector(`.thumb-card[data-index="${currentIndex}"]`);
       if (prev) prev.classList.remove('playing');
@@ -919,21 +949,24 @@
     currentIndex = index;
     const v = videos[index];
 
-    // プレイヤーを表示
     playerSection.classList.add('active');
     mainVideo.src = v.file;
     mainVideo.loop = true;
     mainVideo.play();
-    nowPlayingTitle.textContent = `${v.name}（${v.badge}）`;
 
-    // 再生中カードをハイライト
+    const n = currentLang === 'en' ? (v.nameEn  || v.name)  : v.name;
+    const b = currentLang === 'en' ? (v.badgeEn || v.badge) : v.badge;
+    nowPlayingTitle.textContent = currentLang === 'en' ? `${n} (${b})` : `${n}（${b}）`;
+
     const card = grid.querySelector(`.thumb-card[data-index="${index}"]`);
     if (card) {
       card.classList.add('playing');
-      // スムーズにプレイヤーへスクロール
       playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
+
+  // ===== 初期描画 =====
+  renderAll();
 </script>
 
 </body>
