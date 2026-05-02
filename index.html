@@ -40,17 +40,26 @@
     }
 
     /* ======= 目次ナビゲーション ======= */
-    #toc-nav {
+    #toc-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 100;
       background: #161616;
       border-bottom: 1px solid #2a2a2a;
-      padding: 10px 16px;
+    }
+
+    #toc-nav {
+      padding: 10px 40px 10px 16px;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
       white-space: nowrap;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      cursor: grab;
+      user-select: none;
+    }
+
+    #toc-nav.dragging {
+      cursor: grabbing;
     }
 
     #toc-nav::-webkit-scrollbar {
@@ -65,6 +74,21 @@
       text-transform: uppercase;
       vertical-align: middle;
       margin-right: 10px;
+    }
+
+    /* 右端フェードアウト＋スクロールヒント */
+    #toc-scroll-hint {
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: 48px;
+      background: linear-gradient(to right, transparent, #161616);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 6px;
+      font-size: 0.75rem;
+      color: #555;
     }
 
     .toc-item {
@@ -509,10 +533,13 @@
 </header>
 
 <!-- 目次ナビゲーション -->
-<nav id="toc-nav">
-  <span class="toc-label">目次</span>
-  <!-- JavaScriptで動的に生成 -->
-</nav>
+<div id="toc-wrap">
+  <nav id="toc-nav">
+    <span class="toc-label">目次</span>
+    <!-- JavaScriptで動的に生成 -->
+  </nav>
+  <div id="toc-scroll-hint">›</div>
+</div>
 
 <!-- メインプレイヤー -->
 <section id="player-section">
@@ -689,6 +716,31 @@
   const mainVideo       = document.getElementById('main-video');
   const nowPlayingTitle = document.getElementById('now-playing-title');
   const tocNav          = document.getElementById('toc-nav');
+  const tocHint         = document.getElementById('toc-scroll-hint');
+
+  // ===== 目次：マウスドラッグでスクロール（PC対応）=====
+  let isDragging = false, dragStartX = 0, dragScrollLeft = 0;
+  tocNav.addEventListener('mousedown', e => {
+    isDragging = true;
+    dragStartX = e.pageX - tocNav.offsetLeft;
+    dragScrollLeft = tocNav.scrollLeft;
+    tocNav.classList.add('dragging');
+  });
+  document.addEventListener('mouseup', () => {
+    isDragging = false;
+    tocNav.classList.remove('dragging');
+  });
+  tocNav.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - tocNav.offsetLeft;
+    tocNav.scrollLeft = dragScrollLeft - (x - dragStartX);
+  });
+  // スクロール末尾に達したらヒントを隠す
+  tocNav.addEventListener('scroll', () => {
+    const atEnd = tocNav.scrollLeft + tocNav.clientWidth >= tocNav.scrollWidth - 4;
+    tocHint.style.opacity = atEnd ? '0' : '1';
+  });
 
   let currentIndex = -1;
 
